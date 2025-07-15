@@ -1,16 +1,13 @@
 import React from 'react';
 import { LogOut, User, Settings, BarChart3 } from 'lucide-react';
-import { signOut, useSession } from '../lib/auth-client';
 
 interface DashboardProps {
+  user: { email: string; name?: string } | null;
   onLogout: () => void;
 }
 
-export default function Dashboard({ onLogout }: DashboardProps) {
-  const { data: session } = useSession();
-
-  const handleLogout = async () => {
-    await signOut();
+export default function Dashboard({ user, onLogout }: DashboardProps) {
+  const handleLogout = () => {
     onLogout();
   };
 
@@ -28,7 +25,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
             <div className="flex items-center space-x-4">
               <div className="flex items-center text-sm text-gray-700">
                 <User className="w-4 h-4 mr-2" />
-                <span>{session?.user?.email}</span>
+                <span>{user?.email}</span>
               </div>
               
               <button
@@ -47,7 +44,7 @@ export default function Dashboard({ onLogout }: DashboardProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome back, {session?.user?.name || 'User'}!
+            Welcome back, {user?.name || 'User'}!
           </h2>
           <p className="text-gray-600">
             Analyze your website's performance and SEO metrics using Google Lighthouse technology

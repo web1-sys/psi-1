@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { signIn, signUp } from '../lib/auth-client';
 
 interface LoginFormProps {
-  onSuccess: () => void;
+  onSuccess: (user: { email: string; name?: string }) => void;
 }
 
 export default function LoginForm({ onSuccess }: LoginFormProps) {
@@ -22,31 +21,31 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     setLoading(true);
     setError('');
 
+    // Simulate authentication delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     try {
-      if (isLogin) {
-        const result = await signIn.email({
-          email: formData.email,
-          password: formData.password,
-        });
-        
-        if (result.error) {
-          setError(result.error.message || 'Login failed');
-        } else {
-          onSuccess();
-        }
-      } else {
-        const result = await signUp.email({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-        });
-        
-        if (result.error) {
-          setError(result.error.message || 'Registration failed');
-        } else {
-          onSuccess();
-        }
+      // Simple validation
+      if (!formData.email || !formData.password) {
+        setError('Please fill in all required fields');
+        return;
       }
+
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters');
+        return;
+      }
+
+      if (!isLogin && !formData.name) {
+        setError('Name is required for registration');
+        return;
+      }
+
+      // Simulate successful authentication
+      onSuccess({
+        email: formData.email,
+        name: formData.name || formData.email.split('@')[0]
+      });
     } catch (err) {
       setError('An unexpected error occurred');
       console.error('Auth error:', err);
@@ -182,7 +181,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
-            Demo credentials: Use any email and password (min 6 chars)
+            Demo: Use any email and password (min 6 chars) to access the dashboard
           </p>
         </div>
       </div>
